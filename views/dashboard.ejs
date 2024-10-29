@@ -184,17 +184,15 @@
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Function to show modal
         function showModal(message) {
             document.getElementById('modalMessage').innerText = message;
             const modal = new bootstrap.Modal(document.getElementById('notificationModal'));
             modal.show();
         }
 
-        // Handle form submission for deleting users
         document.querySelectorAll('.delete-form').forEach(form => {
             form.addEventListener('submit', function (event) {
-                event.preventDefault(); // Prevent default form submission
+                event.preventDefault();
 
                 const formData = new FormData(this);
                 const actionUrl = this.action;
@@ -203,13 +201,12 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest' // Indicate that this is an AJAX request
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
                     .then(response => {
                         if (response.ok) {
                             showModal('User deleted successfully.');
-                            // Optionally, you can remove the user row from the table without refreshing
                             this.closest('tr').remove();
                         } else {
                             showModal('Access denied!');
@@ -221,30 +218,26 @@
                     });
             });
         })
-        // Function to open update modal and fetch roles
         function openUpdateModal(userId, username, currentRoles) {
             document.getElementById('userId').value = userId;
             document.getElementById('username').value = username;
 
-            // Fetch roles from API
-            fetch('/api/roles') // Replace with your API endpoint for roles
+            fetch('/api/roles')
                 .then(response => response.json())
                 .then(data => {
                     const rolesSelect = document.getElementById('roles');
-                    rolesSelect.innerHTML = '<option value="">Select Role</option>'; // Clear previous options
+                    rolesSelect.innerHTML = '<option value="">Select Role</option>';
 
-                    // Populate roles
                     data.forEach(role => {
                         const option = document.createElement('option');
-                        option.value = role.name; // Assuming role object has a name property
-                        option.textContent = role.name; // Display name in dropdown
+                        option.value = role.name;
+                        option.textContent = role.name;
                         rolesSelect.appendChild(option);
                     });
 
-                    // Set the current role if available
                     if (currentRoles) {
-                        const roleValues = currentRoles.split(', '); // Split by comma for multiple roles
-                        rolesSelect.value = roleValues.includes('admin') ? 'admin' : 'user'; // Update logic as needed
+                        const roleValues = currentRoles.split(', ');
+                        rolesSelect.value = roleValues.includes('admin') ? 'admin' : 'user';
                     }
                 })
                 .catch(error => {
@@ -256,12 +249,11 @@
             modal.show();
         }
 
-        // Handle form submission for updating users
         document.getElementById('updateUserForm').addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
 
             const formData = new FormData(this);
-            const actionUrl = `/api/users/update/${document.getElementById('userId').value}`; // Update this URL as necessary
+            const actionUrl = `/api/users/update/${document.getElementById('userId').value}`;
             let dataObject = {};
             for (const [key, value] of formData.entries()) {
                 console.log(`${key}: ${value}`);
@@ -279,7 +271,7 @@
             })
                 .then(response => {
                     if (response.ok) {
-                        location.reload(); // Reload the page to see changes, or handle UI updates directly
+                        location.reload();
                         showModal('User updated successfully.');
                     } else {
                         showModal('Access denied!');
@@ -291,11 +283,11 @@
                 });
         });
         function openCreateUserModal() {
-            fetch('/api/roles') // Fetch available roles from API
+            fetch('/api/roles')
                 .then(response => response.json())
                 .then(data => {
                     const rolesSelect = document.getElementById('newRoles');
-                    rolesSelect.innerHTML = '<option value="">Select Role</option>'; // Clear previous options
+                    rolesSelect.innerHTML = '<option value="">Select Role</option>';
 
                     data.forEach(role => {
                         const option = document.createElement('option');
@@ -313,7 +305,6 @@
                 });
         }
 
-        // Handle form submission for creating a new user
         document.getElementById('createUserForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -333,7 +324,7 @@
                     console.log(response);
 
                     if (response.ok) {
-                        location.reload(); // Reload page to show new user
+                        location.reload();
                         showModal('User created successfully.');
                     } else {
                         showModal('Failed to create user.');

@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({
-    secret: process.env.JWT_SECRET, // Replace with your secret key
+    secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }

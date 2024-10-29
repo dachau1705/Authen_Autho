@@ -1,4 +1,3 @@
-// models/Permission.js
 const mongoose = require('mongoose');
 
 const permissionSchema = new mongoose.Schema({

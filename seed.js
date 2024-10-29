@@ -6,14 +6,13 @@ const bcryptjs = require('bcryptjs')
 
 require('dotenv').config();
 
-// Kết nối MongoDB
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DB_URI);
         console.log('Connected to MongoDB');
     } catch (error) {
         console.error('MongoDB connection error:', error);
-        process.exit(1); // Dừng server nếu lỗi kết nối
+        process.exit(1); 
     }
 };
 
@@ -21,12 +20,10 @@ connectDB();
 
 const seedData = async () => {
     try {
-        // Xóa dữ liệu cũ
         await Permission.deleteMany({});
         await Role.deleteMany({});
         await User.deleteMany({});
 
-        // 1. Thêm dữ liệu Permission
         const permissions = await Permission.insertMany([
             { name: 'read', description: 'Can read data' },
             { name: 'write', description: 'Can write data' },
@@ -37,7 +34,6 @@ const seedData = async () => {
 
         console.log('Permissions seeded:', permissions);
 
-        // 2. Thêm dữ liệu Role
         const roles = await Role.insertMany([
             { name: 'admin', permissions: permissions.map((p) => p._id) },
             { name: 'editor', permissions: [permissions[0]._id, permissions[1]._id, permissions[3]._id] },
@@ -47,8 +43,7 @@ const seedData = async () => {
         ]);
 
         console.log('Roles seeded:', roles);
-        const hashedPassword = await bcryptjs.hash('password123', 10); // 10 là số vòng băm
-        // 3. Thêm dữ liệu User
+        const hashedPassword = await bcryptjs.hash('password123', 10); 
         const users = await User.insertMany([
             { username: 'alice', password: hashedPassword, roles: [roles[0]._id] },
             { username: 'bob', password: hashedPassword, roles: [roles[1]._id] },
@@ -59,7 +54,6 @@ const seedData = async () => {
 
         console.log('Users seeded:', users);
 
-        // Ngắt kết nối sau khi hoàn thành
         mongoose.connection.close();
     } catch (error) {
         console.error('Error seeding data:', error);

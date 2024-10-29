@@ -6,18 +6,15 @@ const { checkRoles, checkPermission } = require('../middleware/roleMiddleware');
 const User = require('../models/User');
 const Role = require('../models/Role');
 
-// Trang chính (index)
 router.get('/', (req, res) => {
     const isLoggedIn = req.cookies.token ? true : false;
     res.render('index', { isLoggedIn });
 });
 
-// Trang đăng nhập
 router.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/login.html'));
 });
 
-// Dashboard (yêu cầu đăng nhập)
 router.get('/dashboard', verifyToken, checkPermission('read'), async (req, res) => {
     try {
         const userRoles = req.user;
@@ -37,8 +34,8 @@ router.get('/dashboard', verifyToken, checkPermission('read'), async (req, res) 
             role.permissions.some((perm) => perm.name === 'write')
         );
 
-        const users = await User.find().populate('roles'); // Get the list of users
-        res.render('dashboard', { users, hasPermissionEdit, hasPermissionDel, hasPermissionCreate }); // Pass users to the view
+        const users = await User.find().populate('roles'); 
+        res.render('dashboard', { users, hasPermissionEdit, hasPermissionDel, hasPermissionCreate }); 
     } catch (error) {
         console.error('Error fetching users:', error);
         res.status(500).send('Internal Server Error');
@@ -47,12 +44,10 @@ router.get('/dashboard', verifyToken, checkPermission('read'), async (req, res) 
 
 
 
-// Trang chỉ dành cho admin
 router.get('/admin', verifyToken, checkRoles('admin'), (req, res) => {
     res.send('<h1>Admin Dashboard</h1><p>Only admins can access this page.</p>');
 });
 
-// Logout route
 router.get('/logout', (req, res) => {
     res.clearCookie('token');
     if (req.session) {

@@ -1,4 +1,3 @@
-// controllers/userController.js
 const Role = require('../models/Role');
 const User = require('../models/User');
 const bcryptjs = require('bcryptjs')
