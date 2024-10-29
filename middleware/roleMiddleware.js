@@ -28,9 +28,9 @@ const checkRoles = (roleuser) => {
         );
 
         if (hasPermission) {
-            next(); // User has the required role
+            next();
         } else {
-            return res.status(403).send('Access Denied: You do not have the right permissions.'); // Send access denied response
+            return res.status(403).send('Access Denied: You do not have the right permissions.');
         }
     };
 };

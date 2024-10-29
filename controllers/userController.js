@@ -36,4 +36,28 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getUsers, updateUser, deleteUser };
+const createUser = async (req, res) => {
+    try {
+        console.log(111111111111);
+
+        const body = req.body
+        console.log(body);
+
+        const role = await Role.findOne({ name: body.roles })
+        const password = await bcryptjs.hash(body.password, 10);
+        const newUser = new User({
+            username: body.username,
+            password: password,
+            roles: [role._id]
+        });
+        console.log(222222222222);
+
+        await newUser.save();
+        console.log(333333333333);
+        res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to create user' });
+    }
+};
+
+module.exports = { getUsers, updateUser, deleteUser, createUser };

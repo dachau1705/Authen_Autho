@@ -41,13 +41,20 @@
             <p>Explore the features of our application using the navigation links above.</p>
         </div>
         <div class="mt-5">
-            <h2>User List</h2>
+            <div class="d-flex justify-content-between align-items-center mt-5">
+                <h2>User List</h2>
+                <% if (hasPermissionCreate) { %>
+                    <button class="btn btn-primary" onclick="openCreateUserModal()">Create New User</button>
+                    <% } %>
+            </div>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Username</th>
                         <th>Role</th>
-                        <th>Actions</th>
+                        <% if (hasPermissionEdit || hasPermissionDel) { %>
+                            <th>Actions</th>
+                            <% } %>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,19 +66,30 @@
                             <td>
                                 <%= user.roles.map(role=> role.name).join(', ') %>
                             </td>
-                            <td>
-                                <form action="/api/users/delete/<%= user._id %>" method="POST" style="display:inline;"
-                                    class="delete-form">
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                </form>
-                                <button class="btn btn-info btn-sm"
-                                    onclick="openUpdateModal('<%= user._id %>', '<%= user.username %>', '<%= user.roles.map(role => role.name).join(', ') %>')">Update</button>
-                            </td>
+
+                            <% if (hasPermissionEdit || hasPermissionDel) { %>
+                                <td>
+                                    <% if (hasPermissionDel) { %>
+                                        <form action="/api/users/delete/<%= user._id %>" method="POST"
+                                            style="display:inline;" class="delete-form">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                        <% } %>
+
+                                            <% if (hasPermissionEdit) { %>
+                                                <button class="btn btn-info btn-sm" onclick="openUpdateModal('<%= user._id %>', '<%= user.username %>', 
+                                            '<%= user.roles.map(role => role.name).join(', ') %>')">
+                                                    Update
+                                                </button>
+                                                <% } %>
+                                </td>
+                                <% } %>
                         </tr>
                         <% }) %>
                 </tbody>
             </table>
         </div>
+
     </div>
 
     <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel"
@@ -127,6 +145,40 @@
         </div>
     </div>
 
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">Create New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="createUserForm" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="newUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="newUsername" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="newPassword" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newRoles" class="form-label">Role</label>
+                            <select class="form-select" id="newRoles" name="roles" required>
+                                <option value="">Select Role</option>
+                                <!-- Roles will be populated here -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -236,6 +288,60 @@
                 .catch(error => {
                     console.error('Error:', error);
                     showModal('Error updating user. Please check your console for more details.');
+                });
+        });
+        function openCreateUserModal() {
+            fetch('/api/roles') // Fetch available roles from API
+                .then(response => response.json())
+                .then(data => {
+                    const rolesSelect = document.getElementById('newRoles');
+                    rolesSelect.innerHTML = '<option value="">Select Role</option>'; // Clear previous options
+
+                    data.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role.name;
+                        option.textContent = role.name;
+                        rolesSelect.appendChild(option);
+                    });
+
+                    const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Error loading roles:', error);
+                    showModal('Error loading roles. Please try again later.');
+                });
+        }
+
+        // Handle form submission for creating a new user
+        document.getElementById('createUserForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            let dataObject = {};
+            formData.forEach((value, key) => dataObject[key] = value);
+
+            fetch('/api/users/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(dataObject)
+            })
+                .then(response => {
+                    console.log(response);
+
+                    if (response.ok) {
+                        location.reload(); // Reload page to show new user
+                        showModal('User created successfully.');
+                    } else {
+                        showModal('Failed to create user.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showModal('Error creating user. Please try again later.');
                 });
         });
     </script>
