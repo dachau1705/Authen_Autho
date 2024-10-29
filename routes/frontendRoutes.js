@@ -7,7 +7,6 @@ const User = require('../models/User');
 
 // Trang chính (index)
 router.get('/', (req, res) => {
-    console.log(req);
     const isLoggedIn = req.cookies.token ? true : false;
     res.render('index', { isLoggedIn });
 });
@@ -20,23 +19,35 @@ router.get('/login', (req, res) => {
 // Dashboard (yêu cầu đăng nhập)
 router.get('/dashboard', verifyToken, checkPermission('read'), async (req, res) => {
     try {
-        const userRoles = req.user;
-        const user = await User.findById(userRoles.userId).populate('roles');
-
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
-        res.send(`<h1>Welcome, ${user.username}</h1><p>You are logged in!</p>`);
+        const users = await User.find().populate('roles'); // Get the list of users
+        res.render('dashboard', { users }); // Pass users to the view
     } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error('Error fetching users:', error);
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 
 // Trang chỉ dành cho admin
 router.get('/admin', verifyToken, checkRoles('admin'), (req, res) => {
     res.send('<h1>Admin Dashboard</h1><p>Only admins can access this page.</p>');
 });
+
+// Logout route
+router.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    if (req.session) {
+        req.session.destroy(err => {
+            if (err) {
+                console.error('Error destroying session:', err);
+            }
+            res.redirect('/');
+        });
+    } else {
+        res.redirect('/');
+    }
+});
+
 
 module.exports = router;

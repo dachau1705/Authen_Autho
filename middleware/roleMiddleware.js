@@ -27,10 +27,11 @@ const checkRoles = (roleuser) => {
             role.name === roleuser
         );
 
-        if (!hasPermission) {
-            return res.status(403).json({ error: 'Access denied' });
+        if (hasPermission) {
+            next(); // User has the required role
+        } else {
+            return res.status(403).send('Access Denied: You do not have the right permissions.'); // Send access denied response
         }
-        next();
     };
 };
 

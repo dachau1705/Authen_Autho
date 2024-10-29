@@ -13,7 +13,7 @@
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Express App</a>
+            <a class="navbar-brand" href="/">Express App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -21,18 +21,21 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <!-- Conditionally render Login link -->
-                    {{#if isLoggedIn}}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin">Admin</a>
-                    </li>
-                    {{else}}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
-                    </li>
-                    {{/if}}
+                    <% if (isLoggedIn) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Admin</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a> <!-- Logout link -->
+                        </li>
+                        <% } else { %>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/login">Login</a>
+                            </li>
+                            <% } %>
                 </ul>
             </div>
         </div>
@@ -43,8 +46,11 @@
             <h1 class="display-4">Welcome to the Express App</h1>
             <p class="lead">This is a simple web app built with Express.js.</p>
             <hr class="my-4">
-            <p>Use the navigation links above to access different pages.</p>
-            <a class="btn btn-primary btn-lg" href="/login" role="button">Login</a>
+            <% if (isLoggedIn) { %>
+                <p>Use the navigation links above to access different pages.</p>
+                <% } else { %>
+                    <a class="btn btn-primary btn-lg" href="/login" role="button">Login</a>
+                    <% } %>
         </div>
     </div>
 

@@ -5,7 +5,7 @@ const verifyToken = require('../middleware/authMiddleware');
 const { checkPermission } = require('../middleware/roleMiddleware');
 
 router.get('/', verifyToken, checkPermission('read'), getUsers);
-router.put('/:id', verifyToken, checkPermission('update'), updateUser);
-router.delete('/:id', verifyToken, checkPermission('delete'), deleteUser);
+router.post('/update/:id', verifyToken, checkPermission('update'), updateUser);
+router.post('/delete/:id', verifyToken, checkPermission('delete'), deleteUser);
 
 module.exports = router;

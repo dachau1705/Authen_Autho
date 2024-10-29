@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-
+const session = require('express-session');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const roleRoutes = require('./routes/roleRoutes');
@@ -15,6 +15,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(session({
+    secret: process.env.JWT_SECRET, // Replace with your secret key
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules', 'bootstrap', 'dist')));
 app.use('/popper', express.static(path.join(__dirname, 'node_modules', '@popperjs', 'core', 'dist')));
 app.use(express.static(path.join(__dirname, 'public')));
