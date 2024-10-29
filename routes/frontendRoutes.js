@@ -7,10 +7,9 @@ const User = require('../models/User');
 
 // Trang chính (index)
 router.get('/', (req, res) => {
-    console.log(req.cookies.token);
-
-    const isLoggedIn = req.cookies.token ? true : false; // Check if token exists in cookies
-    res.render('index', { isLoggedIn }); // Render the index page and pass the isLoggedIn flag
+    console.log(req);
+    const isLoggedIn = req.cookies.token ? true : false;
+    res.render('index', { isLoggedIn });
 });
 
 // Trang đăng nhập
@@ -24,12 +23,9 @@ router.get('/dashboard', verifyToken, checkPermission('read'), async (req, res) 
         const userRoles = req.user;
         const user = await User.findById(userRoles.userId).populate('roles');
 
-        // Kiểm tra xem người dùng có tồn tại không
         if (!user) {
             return res.status(404).send('User not found');
         }
-
-        console.log(user);
         res.send(`<h1>Welcome, ${user.username}</h1><p>You are logged in!</p>`);
     } catch (error) {
         console.error('Error fetching user:', error);

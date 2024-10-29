@@ -1,7 +1,6 @@
 // controllers/userController.js
 const User = require('../models/User');
 
-// Lấy danh sách người dùng
 const getUsers = async (req, res) => {
     try {
         const users = await User.find().populate('roles');
@@ -11,7 +10,6 @@ const getUsers = async (req, res) => {
     }
 };
 
-// Cập nhật thông tin người dùng
 const updateUser = async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -21,7 +19,6 @@ const updateUser = async (req, res) => {
     }
 };
 
-// Xóa người dùng
 const deleteUser = async (req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id);

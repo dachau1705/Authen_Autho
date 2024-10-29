@@ -1,12 +1,10 @@
 const Role = require('../models/Role');
-const Permission = require('../models/Permission'); // Import nếu cần liên kết permission
+const Permission = require('../models/Permission');
 
-// Tạo role mới
 const createRole = async (req, res) => {
     try {
         const { name, permissions } = req.body;
 
-        // Tạo role mới và lưu vào DB
         const newRole = new Role({ name, permissions });
         await newRole.save();
 
@@ -17,7 +15,6 @@ const createRole = async (req, res) => {
     }
 };
 
-// Lấy danh sách tất cả các roles
 const getAllRoles = async (req, res) => {
     try {
         const roles = await Role.find().populate('permissions');
@@ -28,7 +25,6 @@ const getAllRoles = async (req, res) => {
     }
 };
 
-// Lấy role theo ID
 const getRoleById = async (req, res) => {
     try {
         const role = await Role.findById(req.params.id).populate('permissions');
@@ -41,14 +37,13 @@ const getRoleById = async (req, res) => {
     }
 };
 
-// Cập nhật role
 const updateRole = async (req, res) => {
     try {
         const { name, permissions } = req.body;
         const role = await Role.findByIdAndUpdate(
             req.params.id,
             { name, permissions },
-            { new: true } // Trả về role mới sau khi cập nhật
+            { new: true }
         );
 
         if (!role) return res.status(404).json({ error: 'Role not found' });
@@ -60,7 +55,6 @@ const updateRole = async (req, res) => {
     }
 };
 
-// Xóa role
 const deleteRole = async (req, res) => {
     try {
         const role = await Role.findByIdAndDelete(req.params.id);
