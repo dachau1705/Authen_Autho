@@ -7,7 +7,10 @@ const User = require('../models/User');
 
 // Trang chính (index)
 router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    console.log(req.cookies.token);
+
+    const isLoggedIn = req.cookies.token ? true : false; // Check if token exists in cookies
+    res.render('index', { isLoggedIn }); // Render the index page and pass the isLoggedIn flag
 });
 
 // Trang đăng nhập
